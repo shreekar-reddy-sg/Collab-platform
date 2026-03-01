@@ -1,6 +1,6 @@
 import { Router } from "express";
-import { createChannel } from "../controllers/channel.controller";
-import { protect } from "../middleware/auth.middleware";
+import { createChannel } from "../controllers/channel.controller.js";
+import { protect } from "../middleware/auth.middleware.js";
 
 const router = Router();
 

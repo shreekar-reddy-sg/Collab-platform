@@ -1,6 +1,6 @@
 import { Router } from "express";
-import { createTeam } from "../controllers/team.controller";
-import { protect } from "../middleware/auth.middleware";
+import { createTeam } from "../controllers/team.controller.js";
+import { protect } from "../middleware/auth.middleware.js";
 
 const router = Router();
 
