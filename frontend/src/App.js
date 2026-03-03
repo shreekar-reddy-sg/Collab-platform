@@ -6,24 +6,39 @@ const socket = io("http://localhost:5000");
 function App() {
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
+  const [room, setRoom] = useState("");
+  
 
   useEffect(() => {
-    socket.on("connect", () => {
-      console.log("Connected to server with ID: ", socket.id);
-    });
-    socket.on("receive_message", (data) => {
-      setMessages((prev) => [...prev, data]);
-    });
-  }, []);
+  const handleReceive = (data) => {
+    setMessages((prev) => [...prev, data.message]);
+  };
+
+  socket.on("receive_message", handleReceive);
+
+  return () => {
+    socket.off("receive_message", handleReceive);
+  };
+}, []);
 
   const sendMessage = () => {
-    socket.emit("send_message", message);
+    socket.emit("send_message", {
+      room: room,
+      message: message,
+    });
     setMessage("");
   };
 
   return (
     <div>
       <h2>Real Time Chat</h2>
+
+      <input 
+        value={room}
+        onChange={(e) => setRoom(e.target.value)}
+        placeholder="Enter room ID"
+      />
+      <button onClick={() => socket.emit("join_room", room)}>Join Room</button>
 
       <input
         value={message}
