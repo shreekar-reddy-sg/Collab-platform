@@ -5,6 +5,7 @@ import cors from 'cors';
 import http from 'http';
 import { Server } from 'socket.io';
 import express from 'express';
+import Message from './models/message.model.js';
 
 app.use(cors());
 app.use(express.json());
@@ -21,19 +22,33 @@ const io = new Server(server, {
 io.on('connection', (socket) => {
     console.log('A user connected: ', socket.id);
 
-    socket.on("join_room", (room) => {
+    socket.on("join_room", async (room) => {
         socket.join(room);
         console.log(`User ${socket.id} joined room: ${room}`);
+
+        const messages = await Message.find({ room }).sort({ timestamp: 1 });
+
+        socket.emit("chat_history", messages);
     });
-    socket.on("send_message", (data) => {
-        console.log("Message received: ", data);
-        io.to(data.room).emit("receive_message", data);
-    });
+
+    socket.on("send_message", async (data) => {
+
+  const message = new Message({
+    room: data.room,
+    message: data.message,
+    sender: "user"   // temporary
+  });
+
+  const savedMessage = await message.save();
+
+  io.to(data.room).emit("receive_message", savedMessage);
+
+});
+
     socket.on('disconnect', () => {
         console.log('A user disconnected: ', socket.id);
     });
 });
-
 server.listen(process.env.PORT, () => {
     console.log(`Server is running on port ${process.env.PORT}`);
     connectDB();

@@ -10,15 +10,22 @@ function App() {
   
 
   useEffect(() => {
+
   const handleReceive = (data) => {
-    setMessages((prev) => [...prev, data.message]);
+    setMessages((prev) => [...prev, data]);
   };
+
+  socket.on("chat_history", (history) => {
+    setMessages(history);
+  });
 
   socket.on("receive_message", handleReceive);
 
   return () => {
     socket.off("receive_message", handleReceive);
+    socket.off("chat_history");
   };
+
 }, []);
 
   const sendMessage = () => {
@@ -48,7 +55,7 @@ function App() {
 
       <div>
         {messages.map((msg, index) => (
-          <p key={index}>{msg}</p>
+          <p key={index}>{msg.message}</p>
         ))}
       </div>
     </div>
