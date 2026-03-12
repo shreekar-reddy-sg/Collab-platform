@@ -36,7 +36,7 @@ io.on('connection', (socket) => {
   const message = new Message({
     room: data.room,
     message: data.message,
-    sender: "user"   // temporary
+    sender: data.sender   
   });
 
   const savedMessage = await message.save();

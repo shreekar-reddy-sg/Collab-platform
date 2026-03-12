@@ -7,6 +7,7 @@ function App() {
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
   const [room, setRoom] = useState("");
+  const [username, setUsername] = useState("");
   
 
   useEffect(() => {
@@ -32,6 +33,7 @@ function App() {
     socket.emit("send_message", {
       room: room,
       message: message,
+      sender: username
     });
     setMessage("");
   };
@@ -47,6 +49,12 @@ function App() {
       />
       <button onClick={() => socket.emit("join_room", room)}>Join Room</button>
 
+      <input 
+        value={username}
+        onChange={(e) => setUsername(e.target.value)}
+        placeholder="Enter username"
+      />
+
       <input
         value={message}
         onChange={(e) => setMessage(e.target.value)}
@@ -55,7 +63,7 @@ function App() {
 
       <div>
         {messages.map((msg, index) => (
-          <p key={index}>{msg.message}</p>
+          <p key={index}> [{msg.timestamp.toString()}] {msg.sender}: {msg.message}</p>
         ))}
       </div>
     </div>
