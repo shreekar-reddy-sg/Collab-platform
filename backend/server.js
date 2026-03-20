@@ -6,6 +6,14 @@ import http from 'http';
 import { Server } from 'socket.io';
 import express from 'express';
 import Message from './models/message.model.js';
+import { createClient } from 'redis';
+import { createAdapter } from '@socket.io/redis-adapter';
+
+const pubClient = createClient({ url: 'redis://localhost:6379' });
+const subClient = pubClient.duplicate();
+
+await pubClient.connect();
+await subClient.connect();
 
 app.use(cors());
 app.use(express.json());
@@ -18,6 +26,8 @@ const io = new Server(server, {
         origin: 'http://localhost:3000'
     }
 });
+
+io.adapter(createAdapter(pubClient, subClient));
 
 io.on('connection', (socket) => {
     console.log('A user connected: ', socket.id);
